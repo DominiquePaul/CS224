@@ -40,11 +40,45 @@ def forward_backward_prop(X, labels, params, dimensions):
 
     # Note: compute cost based on `sum` not `mean`.
     ### YOUR CODE HERE: forward propagation
-    raise NotImplementedError
+    layer1 = sigmoid(np.dot(X, W1) + b1)
+    y_ = softmax(np.dot(layer1,W2) + b2)
+
+    print("Shape of X: {}".format(X.shape))
+    print("Shape of W1: {}".format(W1.shape))
+    print("Shape of b1: {}".format(b1.shape))
+    print("Shape of layer1: {}".format(layer1.shape))
+    print("Shape of W2: {}".format(W2.shape))
+    print("Shape of b2: {}".format(b2.shape))
+    print("Shape of y_: {}".format(y_.shape))
+    print("\n")
     ### END YOUR CODE
 
+
     ### YOUR CODE HERE: backward propagation
-    raise NotImplementedError
+    cost = np.sum(-np.multiply(labels, np.log(y_))) / X.shape[0]
+
+    grad_pre_l2 = np.subtract(y_, labels) / X.shape[0]
+    gradb2 = np.sum(grad_pre_l2,axis=0)
+    gradW2 = np.dot(layer1.T,grad_pre_l2)
+
+    dh = np.dot(grad_pre_l2, W2.T)
+    grad_pre_l1 = sigmoid_grad(dh)
+    grad_pre_l1 = sigmoid_grad(layer1) * dh
+
+    gradb1 = np.sum(grad_pre_l1, axis=0)
+    gradW1 = np.dot(X.T,grad_pre_l1)
+
+    print("Shape of Grad_pre_l2:    {}".format(grad_pre_l2.shape))
+    print("Shape of  Gradb2:        {}".format(gradb2.shape))
+    print("Shape of  GradW2:        {}".format(gradW2.shape))
+    print("Shape of Grad_pre_l1:    {}".format(grad_pre_l1.shape))
+    print("Shape of Gradb1:         {}".format(gradb1.shape))
+    print("Shape of GradW1:         {}".format(gradW1.shape))
+    print("Cross Entropy Error: {}".format(cost))
+    print("\n")
+
+
+    
     ### END YOUR CODE
 
     ### Stack gradients (do not modify)
@@ -84,7 +118,7 @@ def your_sanity_checks():
     """
     print "Running your sanity checks..."
     ### YOUR CODE HERE
-    raise NotImplementedError
+    print("No personal sanity checks implemented yet...")
     ### END YOUR CODE
 
 

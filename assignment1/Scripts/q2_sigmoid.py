@@ -15,7 +15,7 @@ def sigmoid(x):
     """
 
     ### YOUR CODE HERE
-    raise NotImplementedError
+    s = 1/(1+np.exp(-x))
     ### END YOUR CODE
 
     return s
@@ -23,7 +23,7 @@ def sigmoid(x):
 
 def sigmoid_grad(s):
     """
-    Compute the gradient for the sigmoid function here. Note that
+    Compute the gradient for the sigmoid function here. Notbe that
     for this implementation, the input s should be the sigmoid
     function value of your original input x.
 
@@ -35,7 +35,7 @@ def sigmoid_grad(s):
     """
 
     ### YOUR CODE HERE
-    raise NotImplementedError
+    ds = np.multiply(s,(1-s))
     ### END YOUR CODE
 
     return ds
@@ -72,7 +72,9 @@ def test_sigmoid():
     """
     print "Running your tests..."
     ### YOUR CODE HERE
-    raise NotImplementedError
+    x = np.array([[2,4],
+                [5,3]])
+    print(sigmoid(x))
     ### END YOUR CODE
 
 
