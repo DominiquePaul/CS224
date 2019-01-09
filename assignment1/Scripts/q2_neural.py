@@ -57,8 +57,8 @@ def forward_backward_prop(X, labels, params, dimensions):
     ### YOUR CODE HERE: backward propagation
     cost = np.sum(-np.multiply(labels, np.log(y_))) / X.shape[0]
 
-    grad_pre_l2 = np.subtract(y_, labels) / X.shape[0]
-    gradb2 = np.sum(grad_pre_l2,axis=0)
+    grad_pre_l2 = np.subtract(y_, labels) 
+    gradb2 = np.sum(grad_pre_l2,axis=0) / X.shape[0]
     gradW2 = np.dot(layer1.T,grad_pre_l2)
 
     dh = np.dot(grad_pre_l2, W2.T)
