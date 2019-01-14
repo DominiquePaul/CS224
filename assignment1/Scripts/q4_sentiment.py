@@ -15,6 +15,7 @@ from q3_sgd import load_saved_params, sgd
 # We will use sklearn here because it will run faster than implementing
 # ourselves. However, for other parts of this assignment you must implement
 # the functions yourself!
+import sklearn
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix
 
@@ -49,7 +50,12 @@ def getSentenceFeatures(tokens, wordVectors, sentence):
     sentVector = np.zeros((wordVectors.shape[1],))
 
     ### YOUR CODE HERE
-    raise NotImplementedError
+    print(tokens)
+    print(wordVectors)
+    print(wordVectors.shape)
+    print(sentence)
+    assert False
+    np.mean()
     ### END YOUR CODE
 
     assert sentVector.shape == (wordVectors.shape[1],)

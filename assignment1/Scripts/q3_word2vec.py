@@ -7,6 +7,8 @@ from q1_softmax import softmax
 from q2_gradcheck import gradcheck_naive
 from q2_sigmoid import sigmoid, sigmoid_grad
 
+debug = False
+
 def normalizeRows(x):
     """ Row normalization function
 
@@ -15,7 +17,16 @@ def normalizeRows(x):
     """
 
     ### YOUR CODE HERE
-    raise NotImplementedError
+
+    # we want to root of squares for each row to equal 1
+    # because the square of 1 can only be one, only the sum of squares is relevant
+    # we can normalize vectors by dividing a vector by its L2 norm
+
+   	# question to myself: what do we need this function for?
+
+    l2_norm_by_row = np.sqrt(np.sum(np.square(x), axis=1))
+    x = x/l2_norm_by_row[:,None].astype(float)
+
     ### END YOUR CODE
 
     return x
@@ -41,16 +52,16 @@ def softmaxCostAndGradient(predicted, target, outputVectors, dataset):
     Arguments:
     predicted -- numpy ndarray, predicted word vector (\hat{v} in
                  the written component)
-    target -- integer, the index of the target word
-    outputVectors -- "output" vectors (as rows) for all tokens
+    target -- integer, the index of the target word (V)
+    outputVectors -- "output" vectors (as rows) for all tokens (U)
     dataset -- needed for negative sampling, unused here.
 
     Return:
     cost -- cross entropy cost for the softmax word prediction
     gradPred -- the gradient with respect to the predicted word
-           vector
+           vector (u)
     grad -- the gradient with respect to all the other word
-           vectors
+           vectors (v)
 
     We will not provide starter code for this function, but feel
     free to reference the code you previously wrote for this
@@ -58,7 +69,23 @@ def softmaxCostAndGradient(predicted, target, outputVectors, dataset):
     """
 
     ### YOUR CODE HERE
-    raise NotImplementedError
+
+    v_t = predicted
+    y_hat = softmax(np.dot(v_t,outputVectors.T))
+    cost = -np.log(y_hat[target])
+    
+    y_hat_og = y_hat
+    y_hat[target] -= 1
+
+    grad = np.inner(y_hat.reshape(-1,1), v_t.reshape(-1,1))
+    gradPred = np.dot(outputVectors.T, y_hat)
+
+    # some code for debugging
+    if debug == True:
+	    print("gradPred shape: {}".format(gradPred.shape))
+	    print("grad shape: {}".format(grad.shape))
+	    print(" ")
+
     ### END YOUR CODE
 
     return cost, gradPred, grad
@@ -92,11 +119,35 @@ def negSamplingCostAndGradient(predicted, target, outputVectors, dataset,
 
     # Sampling of indices is done for you. Do not modify this if you
     # wish to match the autograder and receive points!
+
     indices = [target]
     indices.extend(getNegativeSamples(target, dataset, K))
 
     ### YOUR CODE HERE
-    raise NotImplementedError
+
+    v_c = predicted
+
+    left_term = np.log(sigmoid(np.dot(outputVectors, v_c)[target]))
+    right_term = np.sum(np.log(sigmoid(np.dot(-outputVectors, v_c)[indices[1:]])))
+    cost = - left_term - right_term
+
+    gradPred_left_term = np.dot((sigmoid(np.dot(outputVectors[target], v_c)) -1), outputVectors[target])
+    gradPred_right_term = np.sum(((sigmoid(np.dot(-outputVectors, v_c)) - 1)[:,None] * outputVectors)[indices[1:]], axis = 0)
+    gradPred = gradPred_left_term - gradPred_right_term
+
+    grad = -(sigmoid(np.dot(-outputVectors, v_c))-1)[:,None] * v_c
+    grad[target] = (sigmoid(np.dot(outputVectors, v_c)[target]) - 1) * predicted
+    
+    bins = np.zeros(shape=(grad.shape[0],))
+    bins_help = np.bincount(indices)
+    bins[:len(bins_help)] += bins_help
+
+    grad = grad * bins[:,None]
+
+	# print(grad)
+    # print(gradPred)
+    # print(cost)
+
     ### END YOUR CODE
 
     return cost, gradPred, grad
@@ -131,7 +182,31 @@ def skipgram(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
     gradOut = np.zeros(outputVectors.shape)
 
     ### YOUR CODE HERE
-    raise NotImplementedError
+
+    center_word_index = tokens[currentWord]
+    center_word_vector_rep = inputVectors[center_word_index]
+
+    for i in contextWords:
+
+    	correct_word_index = tokens[i]
+    	cost_, gradPred_, grad_ = word2vecCostAndGradient(center_word_vector_rep, correct_word_index ,outputVectors, dataset)
+    	cost += cost_
+    	gradIn[center_word_index] += gradPred_
+    	gradOut += grad_
+
+    # some statements for debugging
+    if False:
+	    print("currentWord: {}".format(currentWord))
+	    print("C: {}".format(C))
+	    print("contextWords: {}".format(contextWords))
+	    print("tokens: {}".format(tokens))
+	    print("inputVectors: {}".format(inputVectors))
+	    print("outputVectors: {}".format(outputVectors))
+	    print(" ")
+	    print("cost: {}".format(cost))
+	    print("gradIn: {}".format(gradIn))
+	    print("gradOut: {}".format(gradOut))
+
     ### END YOUR CODE
 
     return cost, gradIn, gradOut
@@ -155,7 +230,7 @@ def cbow(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
     gradOut = np.zeros(outputVectors.shape)
 
     ### YOUR CODE HERE
-    raise NotImplementedError
+    # CBOW not implemented
     ### END YOUR CODE
 
     return cost, gradIn, gradOut
